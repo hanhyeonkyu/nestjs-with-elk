@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nestjs-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nestjs-app
+  template:
+    metadata:
+      labels:
+        app: nestjs-app
+    spec:
+      containers:
+        - name: nestjs-app
+          image: alexhkhan/nestjs-app:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: production
+          volumeMounts:
+            - name: log
+              mountPath: /var/log
+      volumes:
+        - name: log
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nestjs-app
+spec:
+  selector:
+    app: nestjs-app
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: LoadBalancer
